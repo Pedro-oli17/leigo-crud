@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Painel DevOps</title>
+
+    <style>
+        body {
+            font-family: Arial;
+            background: linear-gradient(120deg, #0f172a, #1e293b);
+            color: white;
+            text-align: center;
+            padding: 30px;
+        }
+
+        .box {
+            background: rgba(255,255,255,0.08);
+            padding: 20px;
+            border-radius: 12px;
+            width: 320px;
+            margin: auto;
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 5px;
+            border-radius: 8px;
+            border: none;
+        }
+
+        button {
+            padding: 10px;
+            width: 95%;
+            margin-top: 10px;
+            border: none;
+            border-radius: 8px;
+            background: #38bdf8;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background: #0ea5e9;
+        }
+
+        /* LISTA BONITA */
+        .user {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+
+            background: rgba(255,255,255,0.08);
+            padding: 12px 15px;
+            margin: 10px auto;
+            border-radius: 10px;
+            width: 320px;
+
+            transition: 0.2s;
+        }
+
+        .user:hover {
+            transform: scale(1.02);
+            background: rgba(255,255,255,0.12);
+        }
+
+        .username {
+            font-weight: bold;
+        }
+
+        .delete {
+            background: #ef4444;
+            border: none;
+            color: white;
+            padding: 6px 10px;
+            border-radius: 6px;
+            cursor: pointer;
+            width: auto;
+        }
+
+        .delete:hover {
+            background: #dc2626;
+        }
+    </style>
+</head>
+
+<body>
+
+<h1>🚀 Painel DevOps</h1>
+
+<div class="box">
+    <h3>Criar usuário</h3>
+    <input id="user" placeholder="usuário">
+    <input id="pass" type="password" placeholder="senha">
+    <button onclick="createUser()">Criar</button>
+</div>
+
+<h3>👥 Usuários</h3>
+<div id="users"></div>
+
+<script>
+
+async function createUser() {
+    const username = document.getElementById("user").value;
+    const password = document.getElementById("pass").value;
+
+    await fetch("/users", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({username, password})
+    });
+
+    loadUsers();
+}
+
+async function loadUsers() {
+    const res = await fetch("/users");
+    const data = await res.json();
+
+    const div = document.getElementById("users");
+    div.innerHTML = "";
+
+    data.forEach(u => {
+        div.innerHTML += `
+            <div class="user">
+                <span class="username">${u.username}</span>
+                <button class="delete" onclick="deleteUser(${u.id})">Excluir</button>
+            </div>
+        `;
+    });
+}
+
+async function deleteUser(id) {
+    await fetch(`/users/${id}`, {method: "DELETE"});
+    loadUsers();
+}
+
+loadUsers();
+
+</script>
+
+</body>
+</html>
